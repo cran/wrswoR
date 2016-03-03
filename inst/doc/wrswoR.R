@@ -26,10 +26,10 @@ knit_print.function <- function(x, options) {
 }
 
 ## ---- echo=FALSE---------------------------------------------------------
-sample_int_rank
+sample_int_R
 
 ## ---- echo=FALSE---------------------------------------------------------
-sample_int_R
+sample_int_rank
 
 ## ----timing-base, echo=FALSE---------------------------------------------
 ggplot_base <- list(
@@ -109,7 +109,7 @@ pow2 <- function(x) {
 }
 
 percent <- function(x) {
-  paste0("\\SI{", round(x * 100, 5), "}{\\percent}")
+  paste0("\\ensuremath{", round(x * 100, 5), "\\,\\%}")
 }
 
 format_expr <- function(x) {
@@ -171,7 +171,7 @@ break_even %>%
   ggplot(aes(x=n, y=R_vs_expj, color=factor(r, levels = c("1", "0.1", "0.01")))) +
   ggplot_base +
   geom_line() +
-  scale_x_log10(name = "$n$", breaks = c(10, 30, 100, 300, 1000)) +
+  scale_x_log10(name = "$n$", breaks = c(10, 30, 100, 300, 1000, 3000)) +
   scale_y_log10(name = "Ratio of median run times\n(\\proglang{R} vs. \\emph{expj})", breaks = 2 ** (-1:5)) +
   scale_color_discrete(name = "$r$")
 
@@ -229,7 +229,8 @@ p_values_true %>%
   geom_point() +
   coord_fixed(ratio = 1 / nrow(p_values_true)) +
   scale_color_discrete(name = "$i$") +
-  scale_shape_discrete(name = "$j$")
+  scale_shape_discrete(name = "$j$") +
+  list()
 
 ## ----correctness-false, echo=FALSE, dependson="def-plot-p-values", fig.cap="Schweder plot for p-values resulting from comparing the \\proglang{R} implementation with a skewed version of itself", fig.height = 3.7----
 p_values_false %>%
@@ -243,7 +244,8 @@ p_values_false %>%
   geom_point() +
   coord_fixed(ratio = 1 / nrow(p_values_false)) +
   scale_color_discrete(name = "$i$") +
-  scale_shape_discrete(name = "$j$")
+  scale_shape_discrete(name = "$j$") +
+  list()
 
 ## ----comprehensive-base, echo = FALSE, dependson="ggplot-base"-----------
 p_value_breakpoints <- c(0, 1e-100, 1e-4, 1e-2, 1e-1, 9e-1, 1)

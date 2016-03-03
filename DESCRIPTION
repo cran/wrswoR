@@ -2,7 +2,8 @@ Encoding: UTF-8
 Package: wrswoR
 Type: Package
 Title: Weighted Random Sampling without Replacement
-Version: 1.0
+Version: 1.0-1
+Date: 2016-03-02
 Authors@R: person(given = "Kirill", family = "Müller", role = c("aut",
         "cre"), email = "krlmlr+r@mailbox.org")
 Description: A collection of implementations of classical and novel
@@ -22,8 +23,8 @@ LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
 NeedsCompilation: yes
-Packaged: 2016-02-22 12:53:16 UTC; muelleki
+Packaged: 2016-03-02 18:54:01 UTC; muelleki
 Author: Kirill Müller [aut, cre]
 Maintainer: Kirill Müller <krlmlr+r@mailbox.org>
 Repository: CRAN
-Date/Publication: 2016-02-22 20:47:25
+Date/Publication: 2016-03-03 05:50:14
