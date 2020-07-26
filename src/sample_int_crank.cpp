@@ -27,6 +27,8 @@ T _divide_by_rexp(T t) { return t / Rf_rexp(1.0); }
 template <class T>
 T _add_one(T t) { return t + 1; }
 
+//' @rdname sample_int
+//' @export
 // [[Rcpp::export(sample_int_crank)]]
 IntegerVector sample_int_crank(int n, int size, NumericVector prob) {
   check_args(n, size, prob);
@@ -63,6 +65,8 @@ struct UniqueNumber {
 };
 
 
+//' @rdname sample_int
+//' @export
 // [[Rcpp::export(sample_int_ccrank)]]
 SEXP sample_int_ccrank(int n, int size, NumericVector prob) {
   check_args(n, size, prob);
@@ -110,6 +114,8 @@ struct Indirection{
   const Rcpp::IntegerVector& _v;
 };
 
+//' @rdname sample_int
+//' @export
 // [[Rcpp::export(sample_int_expj)]]
 IntegerVector sample_int_expj(int n, int size, NumericVector prob) {
   check_args(n, size, prob);
@@ -132,43 +138,41 @@ IntegerVector sample_int_expj(int n, int size, NumericVector prob) {
   }
 
   // Step 4: Repeat Steps 5–10 until the population is exhausted
-  {
+
+  // Incrementing iprob is part of Step 7
+  for (NumericVector::iterator iprob = prob.begin() + size; iprob != prob.end(); ++iprob) {
     // Step 3: The threshold T_w is the minimum key of R
     // (Modification: This is now the logarithm)
     // Step 10: The new threshold T w is the new minimum key of R
     const std::pair<double, int>& T_w = R.top();
 
-    // Incrementing iprob is part of Step 7
-    for (NumericVector::iterator iprob = prob.begin() + size; iprob != prob.end(); ++iprob) {
+    // Step 5: Let r = random(0, 1) and X_w = log(r) / log(T_w)
+    // (Modification: Use e = -exp(1) instead of log(r))
+    double X_w = Rf_rexp(1.0) / T_w.first;
 
-      // Step 5: Let r = random(0, 1) and X_w = log(r) / log(T_w)
-      // (Modification: Use e = -exp(1) instead of log(r))
-      double X_w = Rf_rexp(1.0) / T_w.first;
+    // Step 6: From the current item v_c skip items until item v_i, such that:
+    double w = 0.0;
 
-      // Step 6: From the current item v_c skip items until item v_i, such that:
-      double w = 0.0;
-
-      // Step 7: w_c + w_{c+1} + ··· + w_{i−1} < X_w <= w_c + w_{c+1} + ··· + w_{i−1} + w_i
-      for (; iprob != prob.end(); ++iprob) {
-        w += *iprob;
-        if (X_w <= w)
-          break;
-      }
-
-      // Step 7: No such item, terminate
-      if (iprob == prob.end())
+    // Step 7: w_c + w_{c+1} + ··· + w_{i−1} < X_w <= w_c + w_{c+1} + ··· + w_{i−1} + w_i
+    for (; iprob != prob.end(); ++iprob) {
+      w += *iprob;
+      if (X_w <= w)
         break;
-
-      // Step 9: Let t_w = T_w^{w_i}, r_2 = random(t_w, 1) and v_i’s key: k_i = (r_2)^{1/w_i}
-      // (Mod: Let t_w = log(T_w) * {w_i}, e_2 = log(random(e^{t_w}, 1)) and v_i’s key: k_i = -e_2 / w_i)
-      double t_w = -T_w.first * *iprob;
-      double e_2 = std::log(Rf_runif(std::exp(t_w), 1.0));
-      double k_i = -e_2 / *iprob;
-
-      // Step 8: The item in R with the minimum key is replaced by item v_i
-      R.pop();
-      R.push(std::make_pair(k_i, iprob - prob.begin() + 1));
     }
+
+    // Step 7: No such item, terminate
+    if (iprob == prob.end())
+      break;
+
+    // Step 9: Let t_w = T_w^{w_i}, r_2 = random(t_w, 1) and v_i’s key: k_i = (r_2)^{1/w_i}
+    // (Mod: Let t_w = log(T_w) * {w_i}, e_2 = log(random(e^{t_w}, 1)) and v_i’s key: k_i = -e_2 / w_i)
+    double t_w = -T_w.first * *iprob;
+    double e_2 = std::log(Rf_runif(std::exp(t_w), 1.0));
+    double k_i = -e_2 / *iprob;
+
+    // Step 8: The item in R with the minimum key is replaced by item v_i
+    R.pop();
+    R.push(std::make_pair(k_i, iprob - prob.begin() + 1));
   }
 
   IntegerVector ret(size);
@@ -194,6 +198,8 @@ IntegerVector sample_int_expj(int n, int size, NumericVector prob) {
 template <class T>
 T _runif_to_one_by(T t) { return std::pow(Rf_runif(0.0, 1.0), 1.0 / t); }
 
+//' @rdname sample_int
+//' @export
 // [[Rcpp::export]]
 IntegerVector sample_int_expjs(int n, int size, NumericVector prob) {
   check_args(n, size, prob);
